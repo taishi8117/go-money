@@ -1,6 +1,10 @@
 package money
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -241,4 +245,26 @@ func (c *Currency) get() *Currency {
 
 func (c *Currency) equals(oc *Currency) bool {
 	return c.Code == oc.Code
+}
+
+func (c *Currency) UnmarshalJSON(b []byte) error {
+	data := make(map[string]interface{})
+	err := json.Unmarshal(b, &data)
+	if err != nil {
+		return err
+	}
+	code := strings.ToUpper(data["code"].(string))
+
+	*c = *GetCurrency(code)
+	fmt.Println(c)
+	if c == nil {
+		return errors.New("currency not found")
+	}
+	return nil
+}
+
+func (c Currency) MarshalJSON() ([]byte, error) {
+	buf := bytes.NewBufferString(fmt.Sprintf(`{"code": "%s"}`, c.Code))
+
+	return buf.Bytes(), nil
 }

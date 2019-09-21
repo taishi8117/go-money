@@ -1,6 +1,8 @@
 package money
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -85,4 +87,37 @@ func TestCurrency_GetNonExistingCurrency(t *testing.T) {
 	if currency != nil {
 		t.Errorf("Unexpected currency returned %+v", currency)
 	}
+}
+
+func TestCurrency_Marshaling(t *testing.T) {
+	given := GetCurrency("BTC")
+	expected := `{"code":"BTC"}`
+
+	b, err := json.Marshal(given)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if string(b) != expected {
+		t.Errorf("expected %s got %s", expected, string(b))
+	}
+
+}
+
+func TestCurrency_Unmarshaling(t *testing.T) {
+	given := `{"code": "JPY"}`
+	expected := GetCurrency("JPY")
+
+	var c Currency
+	err := json.Unmarshal([]byte(given), &c)
+	if err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(c)
+	if !c.equals(expected) {
+		t.Errorf("expected %s, got %s", expected.Code, c.Code)
+	}
+
 }
