@@ -1,7 +1,10 @@
 package money
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 // Amount is a datastructure that stores the amount being used for calculations.
@@ -238,4 +241,32 @@ func (m *Money) Display() string {
 func (m *Money) AsMajorUnits() float64 {
 	c := m.currency.get()
 	return c.Formatter().ToMajorUnits(m.amount.val)
+}
+
+func (m *Money) UnmarshalJSON(b []byte) error {
+	return unmarshalJSONMoney(m, b)
+}
+
+func (m Money) MarshalJSON() ([]byte, error) {
+	return marshalJSONMoney(m)
+}
+
+func unmarshalJSONMoney(m *Money, b []byte) error {
+	data := make(map[string]interface{})
+
+	err := json.Unmarshal(b, &data)
+	if err != nil {
+		return nil
+	}
+
+	ref := New(int64(data["amount"].(float64)),
+		data["currency"].(string))
+	m.amount = ref.amount
+	m.currency = ref.Currency()
+	return nil
+}
+
+func marshalJSONMoney(m Money) ([]byte, error) {
+	buf := bytes.NewBufferString(fmt.Sprintf(`{"amount": %d, "currency": "%s"}`, m.Amount(), m.Currency().Code))
+	return buf.Bytes(), nil
 }
