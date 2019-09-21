@@ -91,7 +91,7 @@ func TestCurrency_GetNonExistingCurrency(t *testing.T) {
 
 func TestCurrency_Marshaling(t *testing.T) {
 	given := GetCurrency("BTC")
-	expected := `{"code":"BTC"}`
+	expected := `"BTC"`
 
 	b, err := json.Marshal(given)
 
@@ -106,7 +106,7 @@ func TestCurrency_Marshaling(t *testing.T) {
 }
 
 func TestCurrency_Unmarshaling(t *testing.T) {
-	given := `{"code": "JPY"}`
+	given := `"JPY"`
 	expected := GetCurrency("JPY")
 
 	var c Currency
