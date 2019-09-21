@@ -261,3 +261,7 @@ func (c *Currency) UnmarshalJSON(b []byte) error {
 func (c Currency) MarshalJSON() ([]byte, error) {
 	return json.Marshal(c.Code)
 }
+
+func (c *Currency) Equals(oc *Currency) bool {
+	return c.equals(oc)
+}
