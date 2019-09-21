@@ -259,8 +259,16 @@ func unmarshalJSONMoney(m *Money, b []byte) error {
 		return nil
 	}
 
-	ref := New(int64(data["amount"].(float64)),
-		data["currency"].(string))
+	amt, ok := data["amount"].(float64)
+	if !ok {
+		return errors.New("amount not found")
+	}
+	cur, ok := data["currency"].(string)
+	if !ok {
+		return errors.New("currency not found")
+	}
+
+	ref := New(int64(amt), cur)
 	m.amount = ref.amount
 	m.currency = ref.Currency()
 	return nil

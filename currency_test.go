@@ -2,7 +2,6 @@ package money
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -115,7 +114,6 @@ func TestCurrency_Unmarshaling(t *testing.T) {
 		t.Error(err)
 	}
 
-	fmt.Println(c)
 	if !c.equals(expected) {
 		t.Errorf("expected %s, got %s", expected.Code, c.Code)
 	}
