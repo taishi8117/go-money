@@ -574,6 +574,10 @@ func TestMoney_AsMajorUnits(t *testing.T) {
 	}{
 		{100, "AED", 1.00},
 		{1, "USD", 0.01},
+		{11234567, "BTC", 0.11234567},
+		{777777777, "ETH", 7.77777777},
+		{992233, "JPY", 992233},
+		{98765, "USD", 987.65},
 	}
 
 	for _, tc := range tcs {
@@ -582,6 +586,53 @@ func TestMoney_AsMajorUnits(t *testing.T) {
 
 		if r != tc.expected {
 			t.Errorf("Expected value as major units of %d to be %f got %f", tc.amount, tc.expected, r)
+		}
+	}
+}
+
+func TestMoney_AsMajorUnitsStr(t *testing.T) {
+	tcs := []struct {
+		amount   int64
+		code     string
+		expected string
+	}{
+		{100, "AED", "1.00"},
+		{1, "USD", "0.01"},
+		{11234567, "BTC", "0.11234567"},
+		{100000, "BTC", "0.00100000"},
+		{992233, "JPY", "992233"},
+		{98765, "USD", "987.65"},
+	}
+
+	for _, tc := range tcs {
+		m := New(tc.amount, tc.code)
+		r := m.AsMajorUnitsStr()
+
+		if r != tc.expected {
+			t.Errorf("Expected value as major units of %d to be '%s' got '%s'", tc.amount, tc.expected, r)
+		}
+	}
+}
+
+func TestMoney_FromMajorUnitsStr(t *testing.T) {
+	tcs := []struct {
+		expected int64
+		code     string
+		mus      string
+	}{
+		{100, "AED", "1.00"},
+		{1, "USD", "0.01"},
+		{11234567, "BTC", "0.11234567"},
+		{100000, "BTC", "0.00100000"},
+		{992233, "JPY", "992233"},
+		{98765, "USD", "987.65"},
+	}
+
+	for _, tc := range tcs {
+		m, _ := FromMajorUnitsStr(tc.mus, tc.code)
+
+		if m.Amount() != tc.expected {
+			t.Errorf("Expected value as amount of %s to be %d got %d", tc.mus, tc.expected, m.Amount())
 		}
 	}
 }
@@ -661,7 +712,7 @@ func TestMoney_Amount(t *testing.T) {
 
 func TestMarshaling(t *testing.T) {
 	given := New(12345, "USD")
-	expected := `{"amount":12345,"currency":"USD"}`
+	expected := `{"amount":"123.45","currency":"USD"}`
 
 	b, err := json.Marshal(given)
 
@@ -675,7 +726,7 @@ func TestMarshaling(t *testing.T) {
 }
 
 func TestUnmarshalling(t *testing.T) {
-	given := `{"amount": 10012, "currency":"USD"}`
+	given := `{"amount": "100.12", "currency":"USD"}`
 	expected := "$100.12"
 	var m Money
 	err := json.Unmarshal([]byte(given), &m)

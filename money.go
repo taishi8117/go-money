@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
+	"strconv"
 )
 
 // Amount is a datastructure that stores the amount being used for calculations.
@@ -243,6 +245,24 @@ func (m *Money) AsMajorUnits() float64 {
 	return c.Formatter().ToMajorUnits(m.amount.val)
 }
 
+// AsMajorUnitsStr lets represent Money struct as subunits (float64) in given Currency value
+func (m *Money) AsMajorUnitsStr() string {
+	val := m.AsMajorUnits()
+	f := fmt.Sprintf("%%.%df", m.Currency().Fraction)
+	return fmt.Sprintf(f, val)
+}
+
+func FromMajorUnitsStr(mus string, code string) (*Money, error) {
+	f, err := strconv.ParseFloat(mus, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	c := newCurrency(code).get()
+	amt := int64(math.Pow10(c.Fraction) * f)
+	return New(amt, code), nil
+}
+
 func (m *Money) UnmarshalJSON(b []byte) error {
 	return unmarshalJSONMoney(m, b)
 }
@@ -259,7 +279,7 @@ func unmarshalJSONMoney(m *Money, b []byte) error {
 		return nil
 	}
 
-	amt, ok := data["amount"].(float64)
+	amt, ok := data["amount"].(string)
 	if !ok {
 		return errors.New("amount not found")
 	}
@@ -268,13 +288,16 @@ func unmarshalJSONMoney(m *Money, b []byte) error {
 		return errors.New("currency not found")
 	}
 
-	ref := New(int64(amt), cur)
+	ref, err := FromMajorUnitsStr(amt, cur)
+	if err != nil {
+		return err
+	}
 	m.amount = ref.amount
 	m.currency = ref.Currency()
 	return nil
 }
 
 func marshalJSONMoney(m Money) ([]byte, error) {
-	buf := bytes.NewBufferString(fmt.Sprintf(`{"amount": %d, "currency": "%s"}`, m.Amount(), m.Currency().Code))
+	buf := bytes.NewBufferString(fmt.Sprintf(`{"amount": "%s", "currency": "%s"}`, m.AsMajorUnitsStr(), m.Currency().Code))
 	return buf.Bytes(), nil
 }
