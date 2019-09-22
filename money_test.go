@@ -725,9 +725,23 @@ func TestMarshaling(t *testing.T) {
 	}
 }
 
-func TestUnmarshalling(t *testing.T) {
+func TestUnmarshaling(t *testing.T) {
 	given := `{"amount": "100.12", "currency":"USD"}`
 	expected := "$100.12"
+	var m Money
+	err := json.Unmarshal([]byte(given), &m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if m.Display() != expected {
+		t.Errorf("Expected %s got %s", expected, m.Display())
+	}
+}
+
+func TestUnmarshaling2(t *testing.T) {
+	given := `{"amount": "100", "currency":"USD"}`
+	expected := "$100.00"
 	var m Money
 	err := json.Unmarshal([]byte(given), &m)
 	if err != nil {
