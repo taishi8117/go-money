@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Amount is a datastructure that stores the amount being used for calculations.
@@ -269,6 +271,38 @@ func (m *Money) UnmarshalJSON(b []byte) error {
 
 func (m Money) MarshalJSON() ([]byte, error) {
 	return marshalJSONMoney(m)
+}
+
+func (m Money) GetBSON() (interface{}, error) {
+	amount := m.AsMajorUnitsStr()
+	currency := m.Currency().Code
+	return struct {
+		Amount   string `bson:"amount"`
+		Currency string `bson:"currency"`
+	}{
+		Amount:   amount,
+		Currency: currency,
+	}, nil
+}
+
+func (m *Money) SetBSON(raw bson.Raw) error {
+	decoded := new(struct {
+		Amount   string `bson:"amount"`
+		Currency string `bson:"currency"`
+	})
+	err := bson.Unmarshal(raw, &decoded)
+	if err != nil {
+		return err
+	}
+
+	amount, err := FromMajorUnitsStr(decoded.Amount, decoded.Currency)
+	if err != nil {
+		return err
+	}
+
+	m.amount = amount.amount
+	m.currency = amount.Currency()
+	return nil
 }
 
 func unmarshalJSONMoney(m *Money, b []byte) error {
