@@ -187,9 +187,11 @@ var currencies = map[string]*Currency{
 	"ZMW": {Decimal: ".", Thousand: ",", Code: "ZMW", Fraction: 2, Grapheme: "ZK", Template: "$1"},
 	"ZWD": {Decimal: ".", Thousand: ",", Code: "ZWD", Fraction: 2, Grapheme: "Z$", Template: "$1"},
 
+	// https://github.com/yonilevy/crypto-currency-symbols
 	"BTC":  {Decimal: ".", Thousand: ",", Code: "BTC", Fraction: 8, Grapheme: "\u0e3f", Template: "$1"},
 	"ETH":  {Decimal: ".", Thousand: ",", Code: "ETH", Fraction: 8, Grapheme: "\u039e", Template: "$1"},
-	"USDT": {Decimal: ".", Thousand: ",", Code: "USDT", Fraction: 2, Grapheme: "₮$", Template: "$1"},
+	"USDT": {Decimal: ".", Thousand: ",", Code: "USDT", Fraction: 2, Grapheme: "₮", Template: "$1"},
+	"XRP":  {Decimal: ".", Thousand: ",", Code: "XRP", Fraction: 6, Grapheme: "✕", Template: "$1"},
 }
 
 // AddCurrency lets you insert or update currency in currencies list.
