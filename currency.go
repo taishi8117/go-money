@@ -192,6 +192,7 @@ var currencies = map[string]*Currency{
 	"ETH":  {Decimal: ".", Thousand: ",", Code: "ETH", Fraction: 8, Grapheme: "\u039e", Template: "$1"},
 	"USDT": {Decimal: ".", Thousand: ",", Code: "USDT", Fraction: 2, Grapheme: "₮", Template: "$1"},
 	"XRP":  {Decimal: ".", Thousand: ",", Code: "XRP", Fraction: 6, Grapheme: "✕", Template: "$1"},
+	"LTC":  {Decimal: ".", Thousand: ",", Code: "LTC", Fraction: 8, Grapheme: "Ł", Template: "$1"},
 }
 
 // AddCurrency lets you insert or update currency in currencies list.
